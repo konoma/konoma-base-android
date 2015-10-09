@@ -1,6 +1,1 @@
-<manifest
-    package="ch.konoma.notifications"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <application tools:ignore="AllowBackup"/>
-</manifest>
+<manifest package="ch.konoma.notifications"/>
