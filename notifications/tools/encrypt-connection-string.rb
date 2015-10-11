@@ -7,18 +7,6 @@ require 'json'
 
 # Helper Methods
 
-class NilClass
-	def nil_or_empty?
-    	true
-    end
-end
-
-class String
-	def nil_or_empty?
-		empty?
-	end
-end
-
 def base64_pack(str)
 	[str].pack('m').strip
 end
@@ -29,19 +17,28 @@ end
 
 
 # We use the AES 256 bit cipher-block chaining symetric encryption
-alg = "AES-256-CBC"
-
-default_key = OpenSSL::Cipher::Cipher.new(alg).random_key
-aes = OpenSSL::Cipher::Cipher.new(alg)
+cipher = OpenSSL::Cipher::Cipher.new("AES-256-CBC")
 
 
 # Option Parsing
 
 options = {
-	:key => base64_pack(default_key)
+	:iv => base64_pack(cipher.random_iv),
+	:key => base64_pack(cipher.random_key),
+	:sender => '',
+	:hubname => '',
+	:connection_string => ''
 }
 
 option_parser = OptionParser.new do |opts|
+	opts.on('-I IV', '--iv') do |iv|
+		options[:iv] = iv
+	end
+	
+	opts.on('-K KEY', '--key') do |key|
+		options[:key] = key
+	end
+	
 	opts.on('-S SENDER', '--sender') do |sender|
 		options[:sender] = sender
 	end
@@ -53,18 +50,15 @@ option_parser = OptionParser.new do |opts|
 	opts.on('-C CONNECTION', '--connection') do |connection|
 		options[:connection_string] = connection
 	end
-	
-	opts.on('-K KEY', '--key') do |key|
-		options[:key] = key
-	end
 end
 option_parser.parse!
 
 we_have_all_values = not(
-	options[:key].nil_or_empty? or
-	options[:sender].nil_or_empty? or
-	options[:hubname].nil_or_empty? or
-	options[:connection_string].nil_or_empty?
+	options[:iv].empty? or
+	options[:key].empty? or
+	options[:sender].empty? or
+	options[:hubname].empty? or
+	options[:connection_string].empty?
 )
 
 unless we_have_all_values
@@ -85,17 +79,18 @@ settings_json = JSON.generate(settings)
 
 # Encrypt settings JSON
 
-iv = OpenSSL::Cipher::Cipher.new(alg).random_iv
 key = base64_unpack(options[:key])
-raise 'Key Error' if(key.nil? or key.size != 32)
+iv = base64_unpack(options[:iv])
+raise 'Key Error' if (key.nil? or key.size != 32)
 
-aes.encrypt
-aes.key = key
-aes.iv = iv
+cipher.encrypt
+cipher.key = key
+cipher.iv = iv
 
-encrypted_json = aes.update(settings_json)
-encrypted_json << aes.final 
+encrypted_json =  cipher.update(settings_json)
+encrypted_json << cipher.final
 
 puts "Settings:\n#{JSON.pretty_generate(settings)}\n\n"
 puts "Key:\n#{options[:key]}\n\n"
+puts "IV:\n#{options[:iv]}\n\n"
 puts "Encrypted Settings:\n#{base64_pack(encrypted_json)}\n\n"
