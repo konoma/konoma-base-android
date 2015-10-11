@@ -9,13 +9,14 @@ import com.google.android.gms.gcm.GcmListenerService
 import com.google.android.gms.gcm.GcmReceiver
 
 
-public class NotificationListenerService : GcmListenerService() {
+internal class NotificationListenerService : GcmListenerService() {
 
     override fun onMessageReceived(from: String?, data: Bundle?) {
         logInfo("Received message $data from $from")
 
-        //        val message = data?.getString("alert") ?: ""
-        //        val id = data?.getString("messageId")?.toInt() ?: 0
+        for (notificationCenter in NotificationCenter.allRegisteredNotificationCenters()) {
+            notificationCenter.notifyMessage(from, data)
+        }
     }
 
     companion object {

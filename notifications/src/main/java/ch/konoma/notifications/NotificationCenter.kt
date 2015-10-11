@@ -2,16 +2,22 @@ package ch.konoma.notifications
 
 import android.content.Context
 import android.os.AsyncTask
+import android.os.Bundle
 import android.util.Log
 import com.google.android.gms.gcm.GoogleCloudMessaging
 import com.google.android.gms.iid.InstanceID
 import com.microsoft.windowsazure.messaging.NotificationHub
+import java.util.*
 
 
 public class NotificationCenter(val context: Context, val senderIdentifier: String, val hubName: String, val connectionString: String) {
 
     private val notificationHub = NotificationHub(hubName, connectionString, context)
     private val preferences = context.getSharedPreferences("ch.konoma.notifications", Context.MODE_PRIVATE)
+
+    init {
+        NotificationCenter.registerNotificationCenter(this)
+    }
 
 
     /// Registering
@@ -61,6 +67,25 @@ public class NotificationCenter(val context: Context, val senderIdentifier: Stri
     }
 
 
+    /// Notification Handlers
+
+    internal val notificationHandlers: MutableSet<NotificationHandler> = hashSetOf()
+
+    public fun addNotificationHandler(notificationHandler: NotificationHandler) {
+        notificationHandlers.add(notificationHandler)
+    }
+
+    public fun removeNotificationHandler(notificationHandler: NotificationHandler) {
+        notificationHandlers.remove(notificationHandler)
+    }
+
+    internal fun notifyMessage(from: String?, data: Bundle ?) {
+        for (handler in notificationHandlers) {
+            handler.onMessageReceived(from, data)
+        }
+    }
+
+
     /// Managing the Channels
 
     public val isInitialized: Boolean
@@ -74,5 +99,24 @@ public class NotificationCenter(val context: Context, val senderIdentifier: Stri
                 .putStringSet("channels", channels)
                 .putBoolean("initialized", true)
                 .commit()
+    }
+
+
+    /// Shared State
+
+    companion object {
+
+        private val allNotificationCenters: MutableSet<NotificationCenter> =
+                Collections.newSetFromMap(WeakHashMap<NotificationCenter, Boolean>())
+
+        @Synchronized
+        internal fun allRegisteredNotificationCenters(): Set<NotificationCenter> {
+            return allNotificationCenters.toSet()
+        }
+
+        @Synchronized
+        private fun registerNotificationCenter(notificationCenter: NotificationCenter) {
+            allNotificationCenters.add(notificationCenter)
+        }
     }
 }
