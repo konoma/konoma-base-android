@@ -10,9 +10,11 @@ import com.microsoft.windowsazure.messaging.NotificationHub
 import java.util.*
 
 
-public class NotificationCenter(val context: Context, val senderIdentifier: String, val hubName: String, val connectionString: String) {
+public class NotificationCenter(public val context: Context, public val settings: NotificationSettings) {
 
-    private val notificationHub = NotificationHub(hubName, connectionString, context)
+    constructor(context: Context, key: String, iv: String) : this(context, NotificationSettings.fromManifest(context, key, iv))
+
+    private val notificationHub = NotificationHub(settings.hubName, settings.connectionString, context)
     private val preferences = context.getSharedPreferences("ch.konoma.notifications", Context.MODE_PRIVATE)
 
     init {
@@ -52,11 +54,11 @@ public class NotificationCenter(val context: Context, val senderIdentifier: Stri
         object : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg backgroundParams: Unit) {
                 try {
-                    val token = InstanceID.getInstance(context).getToken(senderIdentifier, GoogleCloudMessaging.INSTANCE_ID_SCOPE)
-                    logInfo("Successfully got GCM token: $token")
+                    val token = InstanceID.getInstance(context).getToken(settings.senderIdentifier, GoogleCloudMessaging.INSTANCE_ID_SCOPE)
+                    logInfo("Successfully got GCM token")
 
-                    val registrationId = notificationHub.register(token, *(channels.toTypedArray())).registrationId
-                    logInfo("Successfully registered for notifications with regID: $registrationId")
+                    notificationHub.register(token, *(channels.toTypedArray())).registrationId
+                    logInfo("Successfully registered for notifications")
 
                     updateRegisteredChannels(channels)
                 } catch (e: Exception) {
