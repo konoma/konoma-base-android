@@ -97,17 +97,17 @@
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="notification-hubs-0.3" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-stdlib-0.14.449" level="project" />
+    <orderEntry type="library" exported="" name="kotlin-runtime-1.0.0-beta-1103" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="notification-hubs-0.3-sources" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="notifications-1.0.1-sources" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-8.1.0" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-runtime-0.14.449" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="notification-hubs-0.3-javadoc" level="project" />
     <orderEntry type="library" exported="" name="notifications-1.0.1-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="kotlin-stdlib-1.0.0-beta-1103" level="project" />
     <orderEntry type="library" exported="" name="notifications-1.0.1" level="project" />
   </component>
 </module>
