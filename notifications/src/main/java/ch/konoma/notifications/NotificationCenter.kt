@@ -10,7 +10,7 @@ import com.microsoft.windowsazure.messaging.NotificationHub
 import java.util.*
 
 
-public class NotificationCenter(public val context: Context, public val settings: NotificationSettings) {
+class NotificationCenter(val context: Context, val settings: NotificationSettings) {
 
     constructor(context: Context, key: String, iv: String) : this(context, NotificationSettings.fromManifest(context, key, iv))
 
@@ -24,7 +24,7 @@ public class NotificationCenter(public val context: Context, public val settings
 
     /// Registering
 
-    public fun registerForNotifications(initialChannels: Set<String> = emptySet()) {
+    fun registerForNotifications(initialChannels: Set<String> = emptySet()) {
         if (isInitialized) {
             registerForNotificationsOnChannels(registeredChannels)
         } else {
@@ -32,21 +32,21 @@ public class NotificationCenter(public val context: Context, public val settings
         }
     }
 
-    public fun addRegisteredChannel(channel: String) {
+    fun addRegisteredChannel(channel: String) {
         val channels = registeredChannels.toMutableSet()
         channels.add(channel)
 
         registerForNotificationsOnChannels(channels)
     }
 
-    public fun removeRegisteredChannel(channel: String) {
+    fun removeRegisteredChannel(channel: String) {
         val channels = registeredChannels.toMutableSet()
         channels.remove(channel)
 
         registerForNotificationsOnChannels(channels)
     }
 
-    public fun registerForNotificationsOnChannels(channels: Set<String>) {
+    fun registerForNotificationsOnChannels(channels: Set<String>) {
         logInfo("Registering for notifications on channels ${channels.sorted()}")
 
         NotificationListenerService.registerGcmReceiver(context)
@@ -73,15 +73,15 @@ public class NotificationCenter(public val context: Context, public val settings
 
     internal val notificationHandlers: MutableSet<NotificationHandler> = hashSetOf()
 
-    public fun addNotificationHandler(notificationHandler: NotificationHandler) {
+    fun addNotificationHandler(notificationHandler: NotificationHandler) {
         notificationHandlers.add(notificationHandler)
     }
 
-    public fun removeNotificationHandler(notificationHandler: NotificationHandler) {
+    fun removeNotificationHandler(notificationHandler: NotificationHandler) {
         notificationHandlers.remove(notificationHandler)
     }
 
-    internal fun notifyMessage(from: String?, data: Bundle ?) {
+    internal fun notifyMessage(from: String?, data: Bundle?) {
         for (handler in notificationHandlers) {
             handler.onMessageReceived(from, data)
         }
@@ -90,10 +90,10 @@ public class NotificationCenter(public val context: Context, public val settings
 
     /// Managing the Channels
 
-    public val isInitialized: Boolean
+    val isInitialized: Boolean
         get() = preferences.getBoolean("initialized", false)
 
-    public val registeredChannels: Set<String>
+    val registeredChannels: Set<String>
         get() = preferences.getStringSet("channels", emptySet())
 
     private fun updateRegisteredChannels(channels: Set<String>) {
