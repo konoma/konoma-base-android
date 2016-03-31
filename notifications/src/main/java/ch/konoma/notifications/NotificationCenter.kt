@@ -17,33 +17,38 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
     private val notificationHub = NotificationHub(settings.hubName, settings.connectionString, context)
     private val preferences = context.getSharedPreferences("ch.konoma.notifications", Context.MODE_PRIVATE)
 
+    var requestedChannels: MutableSet<String> = hashSetOf()
+        private set(newValue) { field = newValue }
+
     init {
         NotificationCenter.registerNotificationCenter(this)
+        this.requestedChannels.addAll(this.registeredChannels)
     }
 
 
     /// Registering
 
     fun registerForNotifications(initialChannels: Set<String> = emptySet()) {
-        if (isInitialized) {
-            registerForNotificationsOnChannels(registeredChannels)
+        this.requestedChannels.clear()
+        if (this.isInitialized) {
+            this.requestedChannels.addAll(this.registeredChannels)
+            this.registerForNotificationsOnChannels(this.registeredChannels)
         } else {
-            registerForNotificationsOnChannels(initialChannels)
+            this.requestedChannels.addAll(initialChannels)
+            this.registerForNotificationsOnChannels(initialChannels)
         }
     }
 
     fun addRegisteredChannel(channel: String) {
-        val channels = registeredChannels.toMutableSet()
-        channels.add(channel)
+        requestedChannels.add(channel)
 
-        registerForNotificationsOnChannels(channels)
+        registerForNotificationsOnChannels(requestedChannels)
     }
 
     fun removeRegisteredChannel(channel: String) {
-        val channels = registeredChannels.toMutableSet()
-        channels.remove(channel)
+        requestedChannels.remove(channel)
 
-        registerForNotificationsOnChannels(channels)
+        registerForNotificationsOnChannels(requestedChannels)
     }
 
     fun registerForNotificationsOnChannels(channels: Set<String>) {

@@ -12,8 +12,8 @@ import javax.crypto.spec.SecretKeySpec
 data class NotificationSettings(
         val senderIdentifier: String,
         val hubName: String,
-        val connectionString: String) {
-
+        val connectionString: String)
+{
     companion object {
 
         @JvmStatic
