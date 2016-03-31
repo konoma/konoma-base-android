@@ -9,29 +9,21 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 
-public data class NotificationSettings(
-        public val senderIdentifier: String,
-        public val hubName: String,
-        public val connectionString: String) {
+data class NotificationSettings(
+        val senderIdentifier: String,
+        val hubName: String,
+        val connectionString: String) {
 
     companion object {
 
         @JvmStatic
-        public fun fromManifest(context: Context, key: String, iv: String): NotificationSettings {
+        fun fromManifest(context: Context, key: String, iv: String): NotificationSettings {
             val settingsKey = "ch.konoma.notifications.settings"
             val metaData = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
             val encryptedSettings = metaData.getString(settingsKey) ?: throw IllegalArgumentException("Could not find meta-data entry $settingsKey")
             val settingsJson = decryptSettings(encryptedSettings, key, iv)
 
             return settingsFromJsonString(settingsJson)
-        }
-
-        private fun asHex(bytes: ByteArray): String {
-            val hexString = StringBuffer()
-            for (b in bytes) {
-                hexString.append(java.lang.String.format("%02X", b))
-            }
-            return hexString.toString()
         }
 
         private fun decryptSettings(encrypted: String, key: String, iv: String): String {
