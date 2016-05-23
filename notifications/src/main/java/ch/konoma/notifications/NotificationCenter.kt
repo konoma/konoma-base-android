@@ -12,7 +12,8 @@ import java.util.*
 
 class NotificationCenter(val context: Context, val settings: NotificationSettings) {
 
-    constructor(context: Context, key: String, iv: String) : this(context, NotificationSettings.fromManifest(context, key, iv))
+    constructor(context: Context, key: String, iv: String) : this(context, NotificationSettings.fromManifest(context, key, iv, "ch.konoma.notifications.settings"))
+    constructor(context: Context, key: String, iv: String, settingsKey: String) : this(context, NotificationSettings.fromManifest(context, key, iv, settingsKey))
 
     private val notificationHub = NotificationHub(settings.hubName, settings.connectionString, context)
     private val preferences = context.getSharedPreferences("ch.konoma.notifications", Context.MODE_PRIVATE)
