@@ -17,8 +17,8 @@ data class NotificationSettings(
     companion object {
 
         @JvmStatic
-        fun fromManifest(context: Context, key: String, iv: String): NotificationSettings {
-            val settingsKey = "ch.konoma.notifications.settings"
+        fun fromManifest(context: Context, key: String, iv: String,
+                         settingsKey: String): NotificationSettings {
             val metaData = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
             val encryptedSettings = metaData.getString(settingsKey) ?: throw IllegalArgumentException("Could not find meta-data entry $settingsKey")
             val settingsJson = decryptSettings(encryptedSettings, key, iv)
