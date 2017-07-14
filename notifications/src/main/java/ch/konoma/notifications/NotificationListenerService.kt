@@ -23,7 +23,7 @@ internal class NotificationListenerService : GcmListenerService() {
 
         private var hasRegisteredReceiver = false
 
-        public fun registerGcmReceiver(context: Context) {
+        fun registerGcmReceiver(context: Context) {
             if (hasRegisteredReceiver) {
                 return
             }

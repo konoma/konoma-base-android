@@ -37,7 +37,7 @@ data class NotificationSettings(
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
 
             try {
-                cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+                cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
                 return String(cipher.doFinal(encryptedBytes))
             } catch (ex: Exception) {
                 logError("Could not decrypt settings")

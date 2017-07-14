@@ -23,7 +23,7 @@ class NotificationsBroadcastReceiver : BroadcastReceiver() {
         logInfo("Received message on BroadcastReceiver")
 
         for (notificationCenter in NotificationCenter.allRegisteredNotificationCenters()) {
-            notificationCenter.notifyMessage(null, intent.getExtras())
+            notificationCenter.notifyMessage(null, intent.extras)
         }
     }
 }
