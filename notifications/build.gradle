@@ -28,7 +28,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['**/*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    implementation 'com.google.android.gms:play-services-gcm:11.8.0'
+    implementation 'com.google.android.gms:play-services-gcm:11.4.0'
 
     testImplementation 'junit:junit:4.12'
 }
