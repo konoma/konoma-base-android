@@ -4,8 +4,7 @@ import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
-import com.google.android.gms.gcm.GoogleCloudMessaging
-import com.google.android.gms.iid.InstanceID
+import com.google.firebase.iid.FirebaseInstanceId
 import com.microsoft.windowsazure.messaging.NotificationHub
 import java.util.*
 
@@ -19,7 +18,9 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
     private val preferences = context.getSharedPreferences("ch.konoma.notifications", Context.MODE_PRIVATE)
 
     var requestedChannels: MutableSet<String> = hashSetOf()
-        private set(newValue) { field = newValue }
+        private set(newValue) {
+            field = newValue
+        }
 
     init {
         NotificationCenter.registerNotificationCenter(this)
@@ -55,13 +56,12 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
     fun registerForNotificationsOnChannels(channels: Set<String>) {
         logInfo("Registering for notifications on channels ${channels.sorted()}")
 
-        NotificationListenerService.registerGcmReceiver(context)
-
         object : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg backgroundParams: Unit) {
                 try {
-                    val token = InstanceID.getInstance(context).getToken(settings.senderIdentifier, GoogleCloudMessaging.INSTANCE_ID_SCOPE)
-                    logInfo("Successfully got GCM token")
+                    val token = FirebaseInstanceId.getInstance().getToken()
+
+                    logInfo("Successfully got FCM token")
 
                     notificationHub.register(token, *(channels.toTypedArray())).registrationId
                     logInfo("Successfully registered for notifications")
@@ -106,7 +106,7 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
         preferences.edit()
                 .putStringSet("channels", channels)
                 .putBoolean("initialized", true)
-                .commit()
+                .apply()
     }
 
 

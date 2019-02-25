@@ -3,14 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ch.konoma.notifications">
 
-    <permission
-        android:name="${applicationId}.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
 
     <application tools:ignore="AllowBackup">
 
@@ -19,7 +12,7 @@
             android:exported="false">
 
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
