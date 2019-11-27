@@ -59,7 +59,7 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
         object : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg backgroundParams: Unit) {
                 try {
-                    val token = FirebaseInstanceId.getInstance().getToken()
+                    val token = FirebaseInstanceId.getInstance().token
 
                     logInfo("Successfully got FCM token")
 
