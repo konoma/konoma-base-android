@@ -100,7 +100,7 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
         get() = preferences.getBoolean("initialized", false)
 
     val registeredChannels: Set<String>
-        get() = preferences.getStringSet("channels", emptySet())
+        get() = preferences.getStringSet("channels", emptySet()) as Set<String>
 
     private fun updateRegisteredChannels(channels: Set<String>) {
         preferences.edit()
