@@ -1,21 +1,32 @@
 package ch.konoma.notifications
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.microsoft.windowsazure.messaging.NotificationHub
 import java.util.*
 
 
 class NotificationCenter(val context: Context, val settings: NotificationSettings) {
 
-    constructor(context: Context, key: String, iv: String) : this(context, NotificationSettings.fromManifest(context, key, iv, "ch.konoma.notifications.settings"))
-    constructor(context: Context, key: String, iv: String, settingsKey: String) : this(context, NotificationSettings.fromManifest(context, key, iv, settingsKey))
+    constructor(context: Context, key: String, iv: String) : this(
+        context,
+        NotificationSettings.fromManifest(context, key, iv, "ch.konoma.notifications.settings")
+    )
 
-    private val notificationHub = NotificationHub(settings.hubName, settings.connectionString, context)
-    private val preferences = context.getSharedPreferences("ch.konoma.notifications", Context.MODE_PRIVATE)
+    constructor(context: Context, key: String, iv: String, settingsKey: String) : this(
+        context,
+        NotificationSettings.fromManifest(context, key, iv, settingsKey)
+    )
+
+    private val notificationHub =
+        NotificationHub(settings.hubName, settings.connectionString, context)
+    private val preferences =
+        context.getSharedPreferences("ch.konoma.notifications", Context.MODE_PRIVATE)
 
     var requestedChannels: MutableSet<String> = hashSetOf()
         private set(newValue) {
@@ -56,22 +67,16 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
     fun registerForNotificationsOnChannels(channels: Set<String>) {
         logInfo("Registering for notifications on channels ${channels.sorted()}")
 
-        object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg backgroundParams: Unit) {
-                try {
-                    val token = FirebaseInstanceId.getInstance().token
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+            logInfo("Successfully got FCM token")
 
-                    logInfo("Successfully got FCM token")
+            notificationHub.register(token, *(channels.toTypedArray())).registrationId
+            logInfo("Successfully registered for notifications")
 
-                    notificationHub.register(token, *(channels.toTypedArray())).registrationId
-                    logInfo("Successfully registered for notifications")
-
-                    updateRegisteredChannels(channels)
-                } catch (e: Exception) {
-                    Log.e("RVBW", "Error registering for push notifications: $e")
-                }
-            }
-        }.execute()
+            updateRegisteredChannels(channels)
+        }.addOnFailureListener { e ->
+            Log.e("RVBW", "Error registering for push notifications: $e")
+        }
     }
 
 
@@ -104,9 +109,9 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
 
     private fun updateRegisteredChannels(channels: Set<String>) {
         preferences.edit()
-                .putStringSet("channels", channels)
-                .putBoolean("initialized", true)
-                .apply()
+            .putStringSet("channels", channels)
+            .putBoolean("initialized", true)
+            .apply()
     }
 
 
@@ -115,7 +120,7 @@ class NotificationCenter(val context: Context, val settings: NotificationSetting
     companion object {
 
         private val allNotificationCenters: MutableSet<NotificationCenter> =
-                Collections.newSetFromMap(WeakHashMap<NotificationCenter, Boolean>())
+            Collections.newSetFromMap(WeakHashMap<NotificationCenter, Boolean>())
 
         @Synchronized
         internal fun allRegisteredNotificationCenters(): Set<NotificationCenter> {
